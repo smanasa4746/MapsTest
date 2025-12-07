@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Office Location Pin Demo</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <style>
+        body { font-family: Arial; margin: 0; padding: 0; }
+        #map { height: 70vh; width: 100%; }
+        #info { padding: 15px; font-size: 16px; }
+        button {
+            padding: 12px 20px;
+            background: #007bff;
+            border: none;
+            color: white;
+            font-size: 18px;
+            border-radius: 6px;
+            cursor: pointer;
+            width: 90%;
+            margin: 10px auto;
+            display: block;
+        }
+    </style>
+
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet"
+          href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    />
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+</head>
+
+<body>
+
+<div id="map"></div>
+
+<div id="info">
+    <b>Manager ID:</b> <span id="mid"></span><br><br>
+    <b>Latitude:</b> <span id="lat">—</span><br>
+    <b>Longitude:</b> <span id="lng">—</span><br>
+</div>
+
+<button onclick="submitLocation()">Submit Location</button>
+
+<script>
+    let map, marker;
+
+    const managerId = new URLSearchParams(window.location.search).get("id");
+    document.getElementById("mid").innerText = managerId ?? "Not set";
+
+    function initMap(lat, lng) {
+        map = L.map('map').setView([lat, lng], 17);
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; OpenStreetMap contributors'
+        }).addTo(map);
+
+        marker = L.marker([lat, lng], { draggable: true }).addTo(map);
+
+        marker.on("dragend", function () {
+            let pos = marker.getLatLng();
+            updateLatLng(pos.lat, pos.lng);
+        });
+
+        updateLatLng(lat, lng);
+    }
+
+    function updateLatLng(lat, lng) {
+        document.getElementById("lat").innerText = lat.toFixed(6);
+        document.getElementById("lng").innerText = lng.toFixed(6);
+    }
+
+    // Try GPS
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+            (pos) => {
+                initMap(pos.coords.latitude, pos.coords.longitude);
+            },
+            () => {
+                alert("GPS denied. Using default India center.");
+                initMap(20.5937, 78.9629);
+            }
+        );
+    } else {
+        initMap(20.5937, 78.9629);
+    }
+
+    function submitLocation() {
+        const lat = document.getElementById("lat").innerText;
+        const lng = document.getElementById("lng").innerText;
+
+        const confirmMsg = 
+            "Submit this location?\n\n" +
+            "Manager ID: " + managerId + "\n" +
+            "Latitude: " + lat + "\n" +
+            "Longitude: " + lng;
+
+        if (!confirm(confirmMsg)) return;
+
+        alert("Demo mode: submission successful (no backend).");
+    }
+</script>
+
+</body>
+</html>
