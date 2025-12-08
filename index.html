@@ -5,21 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <style>
-        body { font-family: Arial; margin: 0; padding: 0; }
-        #map { height: 70vh; width: 100%; }
-        #info { padding: 15px; font-size: 16px; }
-        button {
-            padding: 12px 20px;
-            background: #007bff;
-            border: none;
-            color: white;
-            font-size: 18px;
-            border-radius: 6px;
-            cursor: pointer;
-            width: 90%;
-            margin: 10px auto;
-            display: block;
-        }
+        body { background: #f4f6fb; color:#222; }
+        #map { box-shadow: 0 6px 20px rgba(0,0,0,.08); border-radius:8px; overflow:hidden; margin:16px; }
+        #info { max-width:980px; margin:12px auto; background:white; padding:14px; border-radius:10px; box-shadow: 0 6px 20px rgba(0,0,0,.04); }
+        button { background:#2b6ef6; color:white; border-radius:8px; padding:12px 18px; font-weight:600; border:none; }
     </style>
 
     <!-- Leaflet CSS -->
@@ -44,62 +33,140 @@
 <button onclick="submitLocation()">Submit Location</button>
 
 <script>
+
+    /* Improved location + UX script */
     let map, marker;
-
-    const managerId = new URLSearchParams(window.location.search).get("id");
-    document.getElementById("mid").innerText = managerId ?? "Not set";
-
-    function initMap(lat, lng) {
-        map = L.map('map').setView([lat, lng], 17);
-
+    const managerId = new URLSearchParams(window.location.search).get("id") || "Not set";
+    document.getElementById("mid").innerText = managerId;
+    
+    function initMap(lat, lng, zoom = 17) {
+      if (!map) {
+        map = L.map('map').setView([lat, lng], zoom);
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '&copy; OpenStreetMap contributors'
+          attribution: '&copy; OpenStreetMap contributors'
         }).addTo(map);
-
+    
         marker = L.marker([lat, lng], { draggable: true }).addTo(map);
-
-        marker.on("dragend", function () {
-            let pos = marker.getLatLng();
-            updateLatLng(pos.lat, pos.lng);
+        marker.on("dragend", () => {
+          const pos = marker.getLatLng();
+          updateLatLng(pos.lat, pos.lng);
+          map.panTo(pos);
         });
-
-        updateLatLng(lat, lng);
+      } else {
+        map.setView([lat, lng], zoom);
+        marker.setLatLng([lat, lng]);
+      }
+      updateLatLng(lat, lng);
     }
-
+    
     function updateLatLng(lat, lng) {
-        document.getElementById("lat").innerText = lat.toFixed(6);
-        document.getElementById("lng").innerText = lng.toFixed(6);
+      document.getElementById("lat").innerText = Number(lat).toFixed(6);
+      document.getElementById("lng").innerText = Number(lng).toFixed(6);
     }
-
-    // Try GPS
-    if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(
-            (pos) => {
-                initMap(pos.coords.latitude, pos.coords.longitude);
-            },
-            () => {
-                alert("GPS denied. Using default India center.");
-                initMap(20.5937, 78.9629);
+    
+    /* Show a friendly message in the page instead of alert */
+    function showError(msg) {
+      // you can make a nicer UI element instead
+      alert(msg);
+      console.warn(msg);
+    }
+    
+    /* Try Permissions API first so UX is clearer */
+    async function tryLocate() {
+      if (!navigator.geolocation) {
+        showError("Geolocation API not available in this browser.");
+        initMap(20.5937, 78.9629, 5); // fallback
+        return;
+      }
+    
+      // Check permission state if supported
+      if (navigator.permissions && navigator.permissions.query) {
+        try {
+          const perm = await navigator.permissions.query({ name: 'geolocation' });
+          if (perm.state === 'denied') {
+            showError("Location access is blocked for this site. Check browser's site settings and allow Location.");
+            initMap(20.5937, 78.9629, 5);
+            return;
+          }
+          // if 'prompt' or 'granted' — continue to request location
+        } catch (e) {
+          console.info("Permissions API error (non-fatal):", e);
+        }
+      }
+    
+      // Request high-accuracy position
+      navigator.geolocation.getCurrentPosition(
+        pos => {
+          initMap(pos.coords.latitude, pos.coords.longitude, 17);
+        },
+        async (err) => {
+          console.warn("Geolocation error:", err);
+          // err.code: 1=PERMISSION_DENIED, 2=POSITION_UNAVAILABLE, 3=TIMEOUT
+          if (err.code === 1) {
+            showError("Permission denied. Please allow location from the address bar and retry.");
+          } else if (err.code === 2) {
+            showError("Location unavailable on this device. Trying an approximate IP-based fallback...");
+            // Optional: try IP-based fallback (coarse)
+            try {
+              const r = await fetch("https://ipapi.co/json/"); // simple public IP geolocation
+              if (r.ok) {
+                const j = await r.json();
+                if (j && j.latitude && j.longitude) {
+                  initMap(j.latitude, j.longitude, 10);
+                  return;
+                }
+              }
+            } catch (ipErr) {
+              console.warn("IP fallback failed:", ipErr);
             }
-        );
-    } else {
-        initMap(20.5937, 78.9629);
+            initMap(20.5937, 78.9629, 5);
+          } else if (err.code === 3) {
+            showError("Location request timed out. Try again or move to a place with clear sky (for GPS).");
+            initMap(20.5937, 78.9629, 5);
+          } else {
+            showError("Unknown geolocation error. Check browser settings.");
+            initMap(20.5937, 78.9629, 5);
+          }
+        },
+        { enableHighAccuracy: true, timeout: 25000, maximumAge: 0 }
+      );
     }
-
-    function submitLocation() {
-        const lat = document.getElementById("lat").innerText;
-        const lng = document.getElementById("lng").innerText;
-
-        const confirmMsg = 
-            "Submit this location?\n\n" +
-            "Manager ID: " + managerId + "\n" +
-            "Latitude: " + lat + "\n" +
-            "Longitude: " + lng;
-
-        if (!confirm(confirmMsg)) return;
-
-        alert("Demo mode: submission successful (no backend).");
+    
+    /* Add a small control button on the map to re-locate */
+    function addLocateButton() {
+      const locateControl = L.control({ position: 'topright' });
+      locateControl.onAdd = function () {
+        const div = L.DomUtil.create('div', 'leaflet-bar leaflet-control');
+        div.style.background = 'white';
+        div.style.padding = '6px';
+        div.style.cursor = 'pointer';
+        div.title = 'Locate me';
+        div.innerHTML = '📍';
+        div.onclick = () => { tryLocate(); };
+        return div;
+      };
+      locateControl.addTo(map || (L.map(document.createElement('div')))); // safe add later
     }
+    
+    /* initial call */
+    tryLocate();
+    
+    /* Wire submit button to grab current marker coords */
+    async function submitLocation() {
+      const lat = document.getElementById("lat").innerText;
+      const lng = document.getElementById("lng").innerText;
+      const confirmed = confirm(
+        `Submit this location?\n\nManager ID: ${managerId}\nLatitude: ${lat}\nLongitude: ${lng}`
+      );
+      if (!confirmed) return;
+    
+      // Demo mode: you can POST to your API here.
+      alert("Demo mode: submission successful (no backend).");
+    }
+    
+    /* expose submitLocation to button onclick */
+    window.submitLocation = submitLocation;
+
 </script>
 
 </body>
