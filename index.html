@@ -1,173 +1,258 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Office Location Pin Demo</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8">
+    <title>Mauze Directory</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 
     <style>
-        body { background: #f4f6fb; color:#222; }
-        #map { box-shadow: 0 6px 20px rgba(0,0,0,.08); border-radius:8px; overflow:hidden; margin:16px; }
-        #info { max-width:980px; margin:12px auto; background:white; padding:14px; border-radius:10px; box-shadow: 0 6px 20px rgba(0,0,0,.04); }
-        button { background:#2b6ef6; color:white; border-radius:8px; padding:12px 18px; font-weight:600; border:none; }
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Poppins,Arial,sans-serif;
+            background: linear-gradient(135deg,#dce8ff,#f4f8ff);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            padding-top: 40px;
+        }
+
+        .container {
+            width: 740px
+        }
+
+        h2 {
+            font-size: 32px;
+            font-weight: 700;
+            text-align: center;
+            background: linear-gradient(90deg,#0a58ff,#4ca1ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 20px;
+        }
+
+        .select-area {
+            background: rgba(255,255,255,.6);
+            border-radius: 18px;
+            padding: 25px;
+            box-shadow: 0 10px 25px rgba(0,0,0,.15);
+            margin-bottom: 25px;
+        }
+
+        .card {
+            border-radius: 18px;
+            padding: 22px;
+            background: rgba(255,255,255,.95);
+            box-shadow: 0 10px 30px rgba(0,0,0,.2);
+        }
+
+        .row {
+            margin: 10px 0;
+            font-size: 18px;
+            color: #19324a
+        }
+
+            .row b {
+                color: #0a3d91
+            }
+
+        .btnMap {
+            display: inline-block;
+            margin-top: 10px;
+            padding: 10px 18px;
+            background: linear-gradient(90deg,#0072ff,#00c6ff);
+            color: #fff;
+            border-radius: 10px;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .infoBox {
+            margin-top: 8px;
+            padding: 10px;
+            background: #f1f6ff;
+            border-radius: 10px;
+        }
+
+        .notice {
+            margin-top: 10px;
+            padding: 10px;
+            background: #fff3cd;
+            border-radius: 8px;
+            color: #856404;
+            font-weight: 600;
+        }
+
+        iframe {
+            border-radius: 12px
+        }
     </style>
-
-    <!-- Leaflet CSS -->
-    <link rel="stylesheet"
-          href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-    />
-
-    <!-- Leaflet JS -->
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 </head>
 
 <body>
+    <div class="container">
 
-<div id="map"></div>
+        <h2>Mauze Directory</h2>
 
-<div id="info">
-    <b>Manager ID:</b> <span id="mid"></span><br><br>
-    <b>Latitude:</b> <span id="lat">—</span><br>
-    <b>Longitude:</b> <span id="lng">—</span><br>
-</div>
+        <div class="select-area">
+            <select id="mauzeDropdown" style="width:100%;">
+                <option value="">Search Mauze…</option>
+            </select>
+        </div>
 
-<button onclick="submitLocation()">Submit Location</button>
+        <div id="resultContainer" style="display:none;">
+            <div class="card">
 
-<script>
+                <div class="row"><b>Mauze ID:</b> <span id="mauzeID"></span></div>
+                <div class="row"><b>Mauze Name:</b> <span id="mauzeName"></span></div>
+                <div class="row"><b>Ilaqa:</b> <span id="ilaqa"></span></div>
+                <div class="row"><b>Jamiat:</b> <span id="jamiat"></span></div>
 
-    /* Improved location + UX script */
-    let map, marker;
-    const managerId = new URLSearchParams(window.location.search).get("id") || "Not set";
-    document.getElementById("mid").innerText = managerId;
-    
-    function initMap(lat, lng, zoom = 17) {
-      if (!map) {
-        map = L.map('map').setView([lat, lng], zoom);
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-          attribution: '&copy; OpenStreetMap contributors'
-        }).addTo(map);
-    
-        marker = L.marker([lat, lng], { draggable: true }).addTo(map);
-        marker.on("dragend", () => {
-          const pos = marker.getLatLng();
-          updateLatLng(pos.lat, pos.lng);
-          map.panTo(pos);
-        });
-      } else {
-        map.setView([lat, lng], zoom);
-        marker.setLatLng([lat, lng]);
-      }
-      updateLatLng(lat, lng);
-    }
-    
-    function updateLatLng(lat, lng) {
-      document.getElementById("lat").innerText = Number(lat).toFixed(6);
-      document.getElementById("lng").innerText = Number(lng).toFixed(6);
-    }
-    
-    /* Show a friendly message in the page instead of alert */
-    function showError(msg) {
-      // you can make a nicer UI element instead
-      alert(msg);
-      console.warn(msg);
-    }
-    
-    /* Try Permissions API first so UX is clearer */
-    async function tryLocate() {
-      if (!navigator.geolocation) {
-        showError("Geolocation API not available in this browser.");
-        initMap(20.5937, 78.9629, 5); // fallback
-        return;
-      }
-    
-      // Check permission state if supported
-      if (navigator.permissions && navigator.permissions.query) {
-        try {
-          const perm = await navigator.permissions.query({ name: 'geolocation' });
-          if (perm.state === 'denied') {
-            showError("Location access is blocked for this site. Check browser's site settings and allow Location.");
-            initMap(20.5937, 78.9629, 5);
-            return;
-          }
-          // if 'prompt' or 'granted' — continue to request location
-        } catch (e) {
-          console.info("Permissions API error (non-fatal):", e);
+                <div class="row"><b>📍 Mauze Location:</b></div>
+                <div id="mapContainer"></div>
+
+                <div class="row">
+                    <b>📏 Distance from your location:</b>
+                    <span id="userDistance">Detecting…</span>
+                </div>
+
+                <div class="row"><b>🚆 Nearest Railway Station:</b></div>
+                <div id="railwayInfo" class="infoBox"></div>
+
+                <div class="row"><b>✈️ Nearest Airport:</b></div>
+                <div id="airportInfo" class="infoBox"></div>
+
+            </div>
+        </div>
+
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+    <script>
+        const csvUrl =
+            "https://docs.google.com/spreadsheets/d/e/2PACX-1vRapA0pNoeBH0W6n_HYVB2ieB_2ZEi8SPp5ZRAM_oMWLJDn0FVsl6317AEbX1tDZOjyO_WRzW_HWRQb/pub?gid=0&single=true&output=csv";
+
+        const GOOGLE_API_KEY = "AIzaSyAkSyCN2lCcEwtrzY-G0FeCsSsr19xd-9E";
+
+        let sheetData = [];
+
+        /* ---------- helpers ---------- */
+        function normalizeHeader(h) {
+            return h.toString().replace(/\r|\n/g, "").trim().toLowerCase();
         }
-      }
-    
-      // Request high-accuracy position
-      navigator.geolocation.getCurrentPosition(
-        pos => {
-          initMap(pos.coords.latitude, pos.coords.longitude, 17);
-        },
-        async (err) => {
-          console.warn("Geolocation error:", err);
-          // err.code: 1=PERMISSION_DENIED, 2=POSITION_UNAVAILABLE, 3=TIMEOUT
-          if (err.code === 1) {
-            showError("Permission denied. Please allow location from the address bar and retry.");
-          } else if (err.code === 2) {
-            showError("Location unavailable on this device. Trying an approximate IP-based fallback...");
-            // Optional: try IP-based fallback (coarse)
-            try {
-              const r = await fetch("https://ipapi.co/json/"); // simple public IP geolocation
-              if (r.ok) {
-                const j = await r.json();
-                if (j && j.latitude && j.longitude) {
-                  initMap(j.latitude, j.longitude, 10);
-                  return;
-                }
-              }
-            } catch (ipErr) {
-              console.warn("IP fallback failed:", ipErr);
-            }
-            initMap(20.5937, 78.9629, 5);
-          } else if (err.code === 3) {
-            showError("Location request timed out. Try again or move to a place with clear sky (for GPS).");
-            initMap(20.5937, 78.9629, 5);
-          } else {
-            showError("Unknown geolocation error. Check browser settings.");
-            initMap(20.5937, 78.9629, 5);
-          }
-        },
-        { enableHighAccuracy: true, timeout: 25000, maximumAge: 0 }
-      );
-    }
-    
-    /* Add a small control button on the map to re-locate */
-    function addLocateButton() {
-      const locateControl = L.control({ position: 'topright' });
-      locateControl.onAdd = function () {
-        const div = L.DomUtil.create('div', 'leaflet-bar leaflet-control');
-        div.style.background = 'white';
-        div.style.padding = '6px';
-        div.style.cursor = 'pointer';
-        div.title = 'Locate me';
-        div.innerHTML = '📍';
-        div.onclick = () => { tryLocate(); };
-        return div;
-      };
-      locateControl.addTo(map || (L.map(document.createElement('div')))); // safe add later
-    }
-    
-    /* initial call */
-    tryLocate();
-    
-    /* Wire submit button to grab current marker coords */
-    async function submitLocation() {
-      const lat = document.getElementById("lat").innerText;
-      const lng = document.getElementById("lng").innerText;
-      const confirmed = confirm(
-        `Submit this location?\n\nManager ID: ${managerId}\nLatitude: ${lat}\nLongitude: ${lng}`
-      );
-      if (!confirmed) return;
-    
-      // Demo mode: you can POST to your API here.
-      alert("Demo mode: submission successful (no backend).");
-    }
-    
-    /* expose submitLocation to button onclick */
-    window.submitLocation = submitLocation;
+        function haversine(lat1, lon1, lat2, lon2) {
+            const R = 6371;
+            const dLat = (lat2 - lat1) * Math.PI / 180;
+            const dLon = (lon2 - lon1) * Math.PI / 180;
+            const a =
+                Math.sin(dLat / 2) ** 2 +
+                Math.cos(lat1 * Math.PI / 180) *
+                Math.cos(lat2 * Math.PI / 180) *
+                Math.sin(dLon / 2) ** 2;
+            return (R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))).toFixed(2);
+        }
+        function getUserLocation(cb) {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    p => cb(p.coords.latitude, p.coords.longitude),
+                    () => cb(null, null)
+                );
+            } else cb(null, null);
+        }
 
-</script>
+        /* ---------- load sheet ---------- */
+        Papa.parse(csvUrl, {
+            download: true,
+            header: true,
+            skipEmptyLines: true,
+            transformHeader: normalizeHeader,
+            complete: function (res) {
+                sheetData = res.data;
+
+                sheetData.sort((a, b) =>
+                    (a["jamiat"] || "").localeCompare(b["jamiat"] || "") ||
+                    (a["mauze name"] || "").localeCompare(b["mauze name"] || "")
+                );
+
+                sheetData.forEach(r => {
+                    if (r["mauze id"] && r["mauze name"]) {
+                        $("#mauzeDropdown").append(
+                            new Option(`${r["jamiat"]} - ${r["mauze name"]}`, r["mauze id"])
+                        );
+                    }
+                });
+
+                $("#mauzeDropdown").select2({
+                    placeholder: "Search Jamiat / Mauze Name",
+                    allowClear: true
+                });
+            }
+        });
+
+        /* ---------- on select ---------- */
+        $("#mauzeDropdown").on("change", function () {
+            const row = sheetData.find(r => r["mauze id"] == this.value);
+            if (!row) return;
+
+            $("#resultContainer").show();
+            $("#mauzeID").text(row["mauze id"]);
+            $("#mauzeName").text(row["mauze name"]);
+            $("#ilaqa").text(row["ilaqa"]);
+            $("#jamiat").text(row["jamiat"]);
+
+            const [lat, lng] = row["coordinates"]
+                .replace(/[^\d.,\-]/g, "")
+                .split(",")
+                .map(Number);
+
+            /* Mauze pin */
+            $("#mapContainer").html(`
+            <iframe width="100%" height="300" loading="lazy"
+                src="https://www.google.com/maps/embed/v1/place?key=${GOOGLE_API_KEY}&q=${lat},${lng}&zoom=15">
+            </iframe>
+            <a class="btnMap" target="_blank"
+               href="https://www.google.com/maps?q=${lat},${lng}">
+               Open Mauze Location
+            </a>
+        `);
+
+            /* USER → MAUZE DISTANCE */
+            $("#userDistance").text("Detecting…");
+            getUserLocation((uLat, uLng) => {
+                if (uLat && uLng) {
+                    $("#userDistance").text(haversine(uLat, uLng, lat, lng) + " km");
+                } else {
+                    $("#userDistance").text("Location permission denied");
+                }
+            });
+
+            /* 🚆 Railway — wider zoom, Mauze-based */
+            $("#railwayInfo").html(`
+            <iframe width="100%" height="220" loading="lazy"
+                src="https://www.google.com/maps/embed/v1/search?key=${GOOGLE_API_KEY}&q=railway+station&center=${lat},${lng}&zoom=10">
+            </iframe>
+            <a class="btnMap" target="_blank"
+               href="https://www.google.com/maps/search/railway+station/@${lat},${lng},10z">
+               Open Railway Stations
+            </a>
+        `);
+
+            /* ✈️ Airport — wider zoom, Mauze-based */
+            $("#airportInfo").html(`
+            <iframe width="100%" height="220" loading="lazy"
+                src="https://www.google.com/maps/embed/v1/search?key=${GOOGLE_API_KEY}&q=airport&center=${lat},${lng}&zoom=9">
+            </iframe>
+            <a class="btnMap" target="_blank"
+               href="https://www.google.com/maps/search/airport/@${lat},${lng},9z">
+               Open Airports
+            </a>
+        `);
+        });
+    </script>
 
 </body>
 </html>
