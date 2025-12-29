@@ -9,147 +9,23 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
 
     <style>
-        :root {
-            --primary: #0a58ff;
-            --secondary: #4ca1ff;
-            --text-dark: #19324a;
-            --bg-gradient: linear-gradient(135deg, #e0eafc, #cfdef3);
-        }
-
-        body {
-            margin: 0;
-            padding: 20px;
-            font-family: 'Poppins', sans-serif;
-            background: var(--bg-gradient);
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-        }
-
-        .container {
-            width: 100%;
-            max-width: 700px;
-        }
-
-        h2 {
-            font-size: 2.2rem;
-            text-align: center;
-            background: linear-gradient(90deg, var(--primary), var(--secondary));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            margin-bottom: 30px;
-        }
-
-        /* Search Section */
-        .select-area {
-            background: white;
-            border-radius: 15px;
-            padding: 20px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
-            margin-bottom: 25px;
-        }
-
-        /* Card Styling */
-        .directory-card {
-            background: white;
-            border-radius: 20px;
-            overflow: hidden;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
-            display: none; /* Hidden until search */
-            animation: slideUp 0.4s ease-out;
-        }
-
-        @keyframes slideUp {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .card-header {
-            background: #f8faff;
-            padding: 20px;
-            border-bottom: 1px solid #eee;
-        }
-
-        .mauze-title {
-            margin: 0;
-            color: var(--primary);
-            font-size: 24px;
-        }
-
-        .jamiat-tag {
-            font-size: 14px;
-            color: #666;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        .card-body {
-            padding: 25px;
-        }
-
-        .info-row {
-            margin-bottom: 15px;
-            display: flex;
-            flex-wrap: wrap;
-            border-bottom: 1px solid #f1f1f1;
-            padding-bottom: 10px;
-        }
-
-        .info-label {
-            font-weight: 700;
-            color: var(--text-dark);
-            width: 180px;
-            font-size: 15px;
-        }
-
-        .info-value {
-            flex: 1;
-            color: #444;
-            min-width: 200px;
-        }
-
-        .map-section {
-            margin: 20px 0;
-            border-radius: 12px;
-            overflow: hidden;
-            border: 1px solid #ddd;
-        }
-
-        /* Buttons */
-        .btn-group {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-            margin-top: 20px;
-        }
-
-        .btn {
-            padding: 12px 15px;
-            border-radius: 10px;
-            text-decoration: none;
-            font-weight: 600;
-            text-align: center;
-            font-size: 14px;
-            transition: transform 0.2s;
-            border: none;
-            cursor: pointer;
-        }
-
-        .btn:active { transform: scale(0.98); }
-
+        :root { --primary: #0a58ff; --secondary: #4ca1ff; --text-dark: #19324a; }
+        body { margin: 0; padding: 20px; font-family: 'Poppins', sans-serif; background: #f0f4f8; display: flex; justify-content: center; }
+        .container { width: 100%; max-width: 700px; }
+        h2 { text-align: center; background: linear-gradient(90deg, var(--primary), var(--secondary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 30px; }
+        .select-area { background: white; border-radius: 15px; padding: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); margin-bottom: 25px; }
+        .directory-card { background: white; border-radius: 20px; overflow: hidden; box-shadow: 0 15px 35px rgba(0,0,0,0.1); display: none; }
+        .card-header { background: #f8faff; padding: 20px; border-bottom: 1px solid #eee; }
+        .mauze-title { margin: 0; color: var(--primary); font-size: 24px; }
+        .jamiat-tag { font-size: 14px; color: #666; text-transform: uppercase; }
+        .card-body { padding: 25px; }
+        .info-row { margin-bottom: 12px; display: flex; flex-wrap: wrap; border-bottom: 1px solid #f1f1f1; padding-bottom: 8px; }
+        .info-label { font-weight: 700; color: var(--text-dark); width: 180px; }
+        .info-value { flex: 1; color: #444; }
+        .btn { display: block; width: 100%; padding: 12px; border-radius: 10px; text-decoration: none; font-weight: 600; text-align: center; margin-top: 10px; border: none; cursor: pointer; }
         .btn-primary { background: var(--primary); color: white; }
-        .btn-outline { border: 2px solid #ddd; color: #555; }
-        .btn-suggest { background: #fff3cd; color: #856404; width: 100%; margin-top: 15px; }
-
-        .section-title {
-            margin-top: 25px;
-            padding-bottom: 5px;
-            border-bottom: 2px solid var(--secondary);
-            display: inline-block;
-            font-size: 16px;
-            font-weight: 700;
-            color: var(--primary);
-        }
+        .btn-suggest { background: #fff3cd; color: #856404; margin-top: 20px; }
+        .section-title { margin: 20px 0 10px; padding-bottom: 5px; border-bottom: 2px solid var(--secondary); font-weight: 700; color: var(--primary); }
     </style>
 </head>
 
@@ -159,7 +35,7 @@
 
         <div class="select-area">
             <select id="mauzeDropdown" style="width:100%;">
-                <option value="">Search Jamiat or Mauze Name...</option>
+                <option value="">Loading data...</option>
             </select>
         </div>
 
@@ -168,25 +44,16 @@
                 <div class="jamiat-tag" id="jamiatVal"></div>
                 <h3 class="mauze-title" id="mauzeNameVal"></h3>
             </div>
-
             <div class="card-body">
-                <div id="ilaqaRow" class="info-row">
-                    <span class="info-label">📍 Ilaqa:</span>
-                    <span class="info-value" id="ilaqaVal"></span>
-                </div>
-
-                <div class="info-row">
-                    <span class="info-label">📏 Distance:</span>
-                    <span class="info-value" id="distanceVal">Detecting...</span>
-                </div>
-
-                <div class="map-section" id="mapHolder"></div>
-
+                <div id="ilaqaRow" class="info-row"><span class="info-label">📍 Ilaqa:</span><span class="info-value" id="ilaqaVal"></span></div>
+                <div class="info-row"><span class="info-label">📏 Distance:</span><span class="info-value" id="distanceVal">Detecting...</span></div>
+                
+                <div id="mapHolder" style="margin:20px 0; border-radius:12px; overflow:hidden;"></div>
                 <div id="preciseBtnRow"></div>
 
                 <div id="railwaySection" style="display:none;">
                     <div class="section-title">🚆 Railway Details</div>
-                    <div id="rwNameRow" class="info-row" style="margin-top:10px;"><span class="info-label">Station Name:</span><span class="info-value" id="rwName"></span></div>
+                    <div id="rwNameRow" class="info-row"><span class="info-label">Station Name:</span><span class="info-value" id="rwName"></span></div>
                     <div id="rwLineRow" class="info-row"><span class="info-label">Railway Line:</span><span class="info-value" id="rwLine"></span></div>
                     <div id="rwCodeRow" class="info-row"><span class="info-label">Station Code:</span><span class="info-value" id="rwCode"></span></div>
                     <div id="rwNearRow" class="info-row"><span class="info-label">Nearest Station:</span><span class="info-value" id="rwNear"></span></div>
@@ -194,14 +61,12 @@
 
                 <div id="airportSection" style="display:none;">
                     <div class="section-title">✈️ Airport Details</div>
-                    <div id="apNameRow" class="info-row" style="margin-top:10px;"><span class="info-label">Airport Name:</span><span class="info-value" id="apName"></span></div>
+                    <div id="apNameRow" class="info-row"><span class="info-label">Airport Name:</span><span class="info-value" id="apName"></span></div>
                     <div id="apTypeRow" class="info-row"><span class="info-label">Type:</span><span class="info-value" id="apType"></span></div>
                     <div id="apCodeRow" class="info-row"><span class="info-label">Airport Code:</span><span class="info-value" id="apCode"></span></div>
                 </div>
 
-                <div class="btn-group">
-                    <button class="btn btn-suggest" onclick="suggestEdit()">Suggest Edits / Category Changes</button>
-                </div>
+                <button class="btn btn-suggest" onclick="suggestEdit()">Suggest Edits / Category Changes</button>
             </div>
         </div>
     </div>
@@ -211,165 +76,112 @@
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
     <script>
-        // Replace with your actual Google Maps Embed API Key if you have one. 
-        // Note: Generic "view" link is used as fallback.
-        const GOOGLE_API_KEY = "YOUR_KEY_HERE"; 
+        // Updated URL format for better compatibility
         const csvUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQo0jofOYG07uWWttgjj9IaJJALlVJ53Fwswssg7umlct27w-A9qG0JaTWMaXmth6jm--m4gYr0vA9_/pub?gid=0&single=true&output=csv";
 
         let sheetData = [];
 
-        // Initialization
         $(document).ready(function() {
-            loadData();
-        });
-
-        function loadData() {
             Papa.parse(csvUrl, {
                 download: true,
                 header: true,
                 skipEmptyLines: true,
-                complete: function(res) {
-                    sheetData = res.data;
-                    populateDropdown();
+                // This function cleans your headers so "Mauze Name " becomes "mauzename"
+                transformHeader: h => h.trim().toLowerCase().replace(/[^a-z0-9]/g, ""),
+                complete: function(results) {
+                    sheetData = results.data;
+                    console.log("Data Loaded:", sheetData[0]); // Debugging line
+                    setupDropdown();
+                },
+                error: function(err) {
+                    console.error("Error loading CSV:", err);
+                    alert("Could not load data. Check console for details.");
                 }
             });
-        }
+        });
 
-        function populateDropdown() {
+        function setupDropdown() {
             const dropdown = $("#mauzeDropdown");
-            
+            dropdown.empty().append('<option value="">Search Mauze or Jamiat...</option>');
+
             // Sort by Jamiat
-            sheetData.sort((a, b) => (a["Jamiat"] || "").localeCompare(b["Jamiat"] || ""));
+            sheetData.sort((a, b) => (a.jamiat || "").localeCompare(b.jamiat || ""));
 
             sheetData.forEach((r, index) => {
-                if (r["Mauze Name "]) {
-                    dropdown.append(new Option(`${r["Jamiat"]} - ${r["Mauze Name "]}`, index));
+                const mName = r.mauzename; // Matches cleaned header "Mauze Name "
+                const jName = r.jamiat;
+                if (mName) {
+                    dropdown.append(new Option(`${jName} - ${mName}`, index));
                 }
             });
 
-            dropdown.select2({
-                placeholder: "Search Mauze or Jamiat...",
-                allowClear: true
-            }).on('select2:open', function() {
-                // Focus the search field automatically
-                document.querySelector('.select2-search__field').focus();
+            dropdown.select2().on('select2:open', () => {
+                setTimeout(() => { document.querySelector('.select2-search__field').focus(); }, 10);
             });
         }
 
         $("#mauzeDropdown").on("change", function() {
-            const index = $(this).val();
-            if (index === "") {
-                $("#resultCard").hide();
-                return;
-            }
+            const idx = $(this).val();
+            if (!idx) { $("#resultCard").hide(); return; }
+            
+            const row = sheetData[idx];
+            $("#resultCard").fadeIn();
 
-            const row = sheetData[index];
-            displayCard(row);
+            // Display Logic (using cleaned keys)
+            $("#mauzeNameVal").text(row.mauzename);
+            $("#jamiatVal").text(row.jamiat);
+            
+            toggleRow("#ilaqaRow", "#ilaqaVal", row.ilaqa);
+            
+            // Map Logic
+            if (row.link) {
+                $("#mapHolder").html(`<iframe width="100%" height="250" frameborder="0" src="${row.link.replace("view", "preview")}"></iframe>`).show();
+            } else { $("#mapHolder").hide(); }
+
+            // Precise Button
+            if (row.coordinates) {
+                $("#preciseBtnRow").html(`<a href="https://www.google.com/maps/search/?api=1&query=${row.coordinates}" target="_blank" class="btn btn-primary">📍 More Precise Location</a>`);
+                calculateDist(row.coordinates);
+            } else { $("#preciseBtnRow").empty(); $("#distanceVal").text("N/A"); }
+
+            // Railway & Airport sections
+            const hasRW = row.railwaystationname || row.nearestrailwaystation;
+            $("#railwaySection").toggle(!!hasRW);
+            toggleRow("#rwNameRow", "#rwName", row.railwaystationname);
+            toggleRow("#rwLineRow", "#rwLine", row.railwayline);
+            toggleRow("#rwCodeRow", "#rwCode", row.railwaystationcode);
+            toggleRow("#rwNearRow", "#rwNear", row.nearestrailwaystation);
+
+            const hasAP = row.airportname;
+            $("#airportSection").toggle(!!hasAP);
+            toggleRow("#apNameRow", "#apName", row.airportname);
+            toggleRow("#apTypeRow", "#apType", row.domesticinternational);
+            toggleRow("#apCodeRow", "#apCode", row.airportcode);
         });
 
-        function displayCard(row) {
-            $("#resultCard").fadeIn();
-            
-            // Mandatory Fields
-            $("#mauzeNameVal").text(row["Mauze Name "]);
-            $("#jamiatVal").text(row["Jamiat"]);
-
-            // Conditional Fields (Ilaqa)
-            if (row["Ilaqa"]) {
-                $("#ilaqaRow").show();
-                $("#ilaqaVal").text(row["Ilaqa"]);
-            } else {
-                $("#ilaqaRow").hide();
-            }
-
-            // Map Logic (LINK column)
-            if (row["LINK"]) {
-                const mapHtml = `<iframe width="100%" height="250" frameborder="0" style="border:0" 
-                    src="${row["LINK"].replace("view", "preview")}" allowfullscreen></iframe>`;
-                $("#mapHolder").html(mapHtml).show();
-            } else {
-                $("#mapHolder").hide();
-            }
-
-            // Precise Coordinates Button
-            if (row["Coordinates"]) {
-                $("#preciseBtnRow").html(`
-                    <a href="https://www.google.com/maps/search/?api=1&query=${row["Coordinates"]}" 
-                       target="_blank" class="btn btn-primary" style="display:block; width:100%; box-sizing:border-box;">
-                       📍 More Precise Location
-                    </a>
-                `);
-            } else {
-                $("#preciseBtnRow").empty();
-            }
-
-            // Railway Logic
-            const hasRW = row["Railway Station Name"] || row["Nearest Railway station"];
-            if (hasRW) {
-                $("#railwaySection").show();
-                setVal("#rwName", row["Railway Station Name"], "#rwNameRow");
-                setVal("#rwLine", row["Railway line"], "#rwLineRow");
-                setVal("#rwCode", row["Railway Station Code"], "#rwCodeRow");
-                setVal("#rwNear", row["Nearest Railway station"], "#rwNearRow");
-            } else {
-                $("#railwaySection").hide();
-            }
-
-            // Airport Logic
-            const hasAP = row["Airport Name"];
-            if (hasAP) {
-                $("#airportSection").show();
-                setVal("#apName", row["Airport Name"], "#apNameRow");
-                setVal("#apType", row["Domestic/ International"], "#apTypeRow");
-                setVal("#apCode", row["Airport Code"], "#apCodeRow");
-            } else {
-                $("#airportSection").hide();
-            }
-
-            // Distance Calculation
-            calculateDistance(row["Coordinates"]);
-        }
-
-        function setVal(id, val, rowId) {
-            if (val && val.trim() !== "") {
-                $(id).text(val);
+        function toggleRow(rowId, valId, val) {
+            if (val && val.toString().trim() !== "") {
+                $(valId).text(val);
                 $(rowId).show();
-            } else {
-                $(rowId).hide();
-            }
+            } else { $(rowId).hide(); }
         }
 
-        function calculateDistance(coords) {
-            if (!coords) {
-                $("#distanceVal").text("Coordinates not available");
-                return;
-            }
-
+        function calculateDist(coords) {
             if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(pos => {
-                    const [destLat, destLng] = coords.split(",").map(Number);
-                    const dist = haversine(pos.coords.latitude, pos.coords.longitude, destLat, destLng);
-                    $("#distanceVal").text(`${dist} km away from you`);
-                }, () => {
-                    $("#distanceVal").text("Location access denied");
-                });
+                navigator.geolocation.getCurrentPosition(p => {
+                    const [lat2, lon2] = coords.split(",").map(Number);
+                    const R = 6371;
+                    const dLat = (lat2 - p.coords.latitude) * Math.PI / 180;
+                    const dLon = (lon2 - p.coords.longitude) * Math.PI / 180;
+                    const a = Math.sin(dLat/2)**2 + Math.cos(p.coords.latitude * Math.PI/180) * Math.cos(lat2 * Math.PI/180) * Math.sin(dLon/2)**2;
+                    const d = (R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a))).toFixed(1);
+                    $("#distanceVal").text(d + " km away");
+                }, () => $("#distanceVal").text("Permission denied"));
             }
-        }
-
-        function haversine(lat1, lon1, lat2, lon2) {
-            const R = 6371;
-            const dLat = (lat2 - lat1) * Math.PI / 180;
-            const dLon = (lon2 - lon1) * Math.PI / 180;
-            const a = Math.sin(dLat / 2) ** 2 +
-                Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
-                Math.sin(dLon / 2) ** 2;
-            return (R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))).toFixed(1);
         }
 
         function suggestEdit() {
-            const mName = $("#mauzeNameVal").text();
-            const mailto = `mailto:admin@example.com?subject=Suggestion for ${mName}&body=I would like to suggest changes for ${mName}...`;
-            window.location.href = mailto;
+            window.location.href = `mailto:admin@example.com?subject=Edit Suggestion: ${$("#mauzeNameVal").text()}`;
         }
     </script>
 </body>
