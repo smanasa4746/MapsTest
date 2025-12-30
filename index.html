@@ -130,6 +130,9 @@
         $("#mauzeDropdown").on("change", function() {
             const idx = $(this).val();
             if (!idx) { $("#resultCard").hide(); return; }
+
+            // 🔴 RESET distance immediately
+            $("#distanceVal").text("Detecting...");
             
             const row = sheetData[idx];
             $("#resultCard").fadeIn();
@@ -198,44 +201,75 @@
         }
 
         function calculateDist(coords) {
+            const requestId = ++gpsRequestId;
+        
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(p => {
+        
+                    // 🛑 Ignore old GPS responses
+                    if (requestId !== gpsRequestId) return;
+        
                     const [lat2, lon2] = coords.split(",").map(c => Number(c.trim()));
-                    if (isNaN(lat2) || isNaN(lon2)) return;
+                    if (isNaN(lat2) || isNaN(lon2)) {
+                        $("#distanceVal").text("Invalid coordinates");
+                        return;
+                    }
+        
                     const R = 6371;
                     const dLat = (lat2 - p.coords.latitude) * Math.PI / 180;
                     const dLon = (lon2 - p.coords.longitude) * Math.PI / 180;
-                    const a = Math.sin(dLat/2)**2 + Math.cos(p.coords.latitude * Math.PI/180) * Math.cos(lat2 * Math.PI/180) * Math.sin(dLon/2)**2;
-                    const d = (R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a))).toFixed(1);
+                    const a =
+                        Math.sin(dLat/2)**2 +
+                        Math.cos(p.coords.latitude * Math.PI/180) *
+                        Math.cos(lat2 * Math.PI/180) *
+                        Math.sin(dLon/2)**2;
+        
+                    const d = (R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))).toFixed(1);
                     $("#distanceVal").text(d + " km away");
-                }, () => $("#distanceVal").text("GPS Permission denied"));
+        
+                }, () => {
+                    if (requestId === gpsRequestId) {
+                        $("#distanceVal").text("GPS Permission denied");
+                    }
+                });
+            } else {
+                $("#distanceVal").text("Geolocation not supported");
             }
         }
+
 
         function suggestEdit() {
             window.location.href = `mailto:gfo@alvazarat.org?subject=Edit Suggestion: ${$("#mauzeNameVal").text()}`;
         }
+        
         function ensureGPS(onAllowed) {
             if (!navigator.geolocation) {
-                alert("Your browser does not support GPS.");
+                $("#distanceVal").text("Geolocation not supported");
+                return;
+            }
+        
+            if (!navigator.permissions) {
+                // Fallback for Safari / older browsers
+                navigator.geolocation.getCurrentPosition(
+                    () => onAllowed(),
+                    () => $("#distanceVal").text("GPS permission required")
+                );
                 return;
             }
         
             navigator.permissions.query({ name: "geolocation" }).then(result => {
                 if (result.state === "granted") {
                     onAllowed();
-                } 
-                else if (result.state === "prompt") {
+                } else if (result.state === "prompt") {
                     navigator.geolocation.getCurrentPosition(
                         () => onAllowed(),
-                        () => showGPSMessage()
+                        () => $("#distanceVal").text("GPS permission required")
                     );
-                } 
-                else {
-                    showGPSMessage(true);
+                } else {
+                    $("#distanceVal").text("GPS is blocked in browser settings");
                 }
             });
-}
+        }
     </script>
 </body>
 </html>
