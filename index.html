@@ -45,8 +45,8 @@
                 <h3 class="mauze-title" id="mauzeNameVal"></h3>
             </div>
             <div class="card-body">
-                <div id="ilaqaRow" class="info-row"><span class="info-label">📍 Ilaqa:</span><span class="info-value" id="ilaqaVal"></span></div>
-                <div class="info-row"><span class="info-label">📏 Distance:</span><span class="info-value" id="distanceVal">Detecting...</span></div>
+                <div id="ilaqaRow" class="info-row"><span class="info-label">📍 Mauze Ilaqa:</span><span class="info-value" id="ilaqaVal"></span></div>
+                <div class="info-row"><span class="info-label">📏 Distance from your current location (Open GPS):</span><span class="info-value" id="distanceVal">Detecting...</span></div>
                 
                 <div id="mapHolder" style="margin:20px 0; border-radius:12px; overflow:hidden;"></div>
                 <div id="preciseBtnRow"></div>
@@ -56,7 +56,7 @@
                     <div id="rwNameRow" class="info-row"><span class="info-label">Station Name:</span><span class="info-value" id="rwName"></span></div>
                     <div id="rwLineRow" class="info-row"><span class="info-label">Railway Line:</span><span class="info-value" id="rwLine"></span></div>
                     <div id="rwCodeRow" class="info-row"><span class="info-label">Station Code:</span><span class="info-value" id="rwCode"></span></div>
-                    <div id="rwNearRow" class="info-row"><span class="info-label">Nearest Station:</span><span class="info-value" id="rwNear"></span></div>
+                    <div id="rwNearRow" class="info-row"><span class="info-label">Nearby Station:</span><span class="info-value" id="rwNear"></span></div>
                 </div>
 
                 <div id="airportSection" style="display:none;">
@@ -77,6 +77,7 @@
 
     <script>
         // Updated URL format for better compatibility
+        const GOOGLE_API_KEY = "AIzaSyAkSyCN2lCcEwtrzY-G0FeCsSsr19xd-9E";
         const csvUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQo0jofOYG07uWWttgjj9IaJJALlVJ53Fwswssg7umlct27w-A9qG0JaTWMaXmth6jm--m4gYr0vA9_/pub?gid=0&single=true&output=csv";
 
         let sheetData = [];
@@ -140,9 +141,9 @@
 
             // Precise Button
             if (row.coordinates) {
-                $("#preciseBtnRow").html(`<a href="https://www.google.com/maps/search/?api=1&query=${row.coordinates}" target="_blank" class="btn btn-primary">📍 More Precise Location</a>`);
+                $("#preciseBtnRow").html(`<a href="https://www.google.com/maps/search/?api=1&query=${row.coordinates}" target="_blank" class="btn btn-primary">📍 Masjid/Markaz Vicinity</a>`);
                 calculateDist(row.coordinates);
-            } else { $("#preciseBtnRow").empty(); $("#distanceVal").text("N/A"); }
+            } else { $("#preciseBtnRow").empty(); $("#distanceVal").text("Masjid/Markaz Vicinity not updated for this Mauze."); }
 
             // Railway & Airport sections
             const hasRW = row.railwaystationname || row.nearestrailwaystation;
@@ -176,12 +177,12 @@
                     const a = Math.sin(dLat/2)**2 + Math.cos(p.coords.latitude * Math.PI/180) * Math.cos(lat2 * Math.PI/180) * Math.sin(dLon/2)**2;
                     const d = (R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a))).toFixed(1);
                     $("#distanceVal").text(d + " km away");
-                }, () => $("#distanceVal").text("Permission denied"));
+                }, () => $("#distanceVal").text("GPS Permission denied"));
             }
         }
 
         function suggestEdit() {
-            window.location.href = `mailto:admin@example.com?subject=Edit Suggestion: ${$("#mauzeNameVal").text()}`;
+            window.location.href = `mailto:gfo@alvazarat.org?subject=Edit Suggestion: ${$("#mauzeNameVal").text()}`;
         }
     </script>
 </body>
