@@ -134,16 +134,50 @@
             
             toggleRow("#ilaqaRow", "#ilaqaVal", row.ilaqa);
             
-            // Map Logic
-            if (row.link) {
-                $("#mapHolder").html(`<iframe width="100%" height="250" frameborder="0" src="${row.link.replace("view", "preview")}"></iframe>`).show();
-            } else { $("#mapHolder").hide(); }
+            // // Map Logic
+            // if (row.link) {
+            //     $("#mapHolder").html(`<iframe width="100%" height="250" frameborder="0" src="${row.link.replace("view", "preview")}"></iframe>`).show();
+            // } else { $("#mapHolder").hide(); }
 
-            // Precise Button
+            // // Precise Button
+            // if (row.coordinates) {
+            //     $("#preciseBtnRow").html(`<a href="https://www.google.com/maps/search/?api=1&query=${row.coordinates}" target="_blank" class="btn btn-primary">📍 Masjid/Markaz Vicinity</a>`);
+            //     calculateDist(row.coordinates);
+            // } else { $("#preciseBtnRow").empty(); $("#distanceVal").text("Masjid/Markaz Vicinity not updated for this Mauze."); }
+
+
+            // Map Holder now uses coordinates
             if (row.coordinates) {
-                $("#preciseBtnRow").html(`<a href="https://www.google.com/maps/search/?api=1&query=${row.coordinates}" target="_blank" class="btn btn-primary">📍 Masjid/Markaz Vicinity</a>`);
+                $("#mapHolder")
+                    .html(
+                        `<iframe 
+                            width="100%" 
+                            height="250" 
+                            frameborder="0" 
+                            src="https://www.google.com/maps?q=${row.coordinates}&output=embed">
+                        </iframe>`
+                    )
+                    .show();
+            
                 calculateDist(row.coordinates);
-            } else { $("#preciseBtnRow").empty(); $("#distanceVal").text("Masjid/Markaz Vicinity not updated for this Mauze."); }
+            } else {
+                $("#mapHolder").hide();
+                $("#distanceVal").text("Masjid/Markaz Vicinity not updated for this Mauze.");
+            }
+            
+            
+            // Precise Button now uses link
+            if (row.link) {
+                $("#preciseBtnRow").html(
+                    `<a href="${row.link.replace("view", "preview")}" 
+                        target="_blank" 
+                        class="btn btn-primary">
+                        📍 Masjid/Markaz Vicinity
+                    </a>`
+                );
+            } else {
+                $("#preciseBtnRow").empty();
+            }
 
             // Railway & Airport sections
             const hasRW = row.railwaystationname || row.nearestrailwaystation;
