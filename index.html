@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mauze Directory</title>
+    <title>Mauze Navigation Guide</title>
 
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
@@ -31,7 +31,7 @@
 
 <body>
     <div class="container">
-        <h2>Mauze Directory</h2>
+        <h2>Mauze Navigation Guide</h2>
 
         <div class="select-area">
             <select id="mauzeDropdown" style="width:100%;">
@@ -46,7 +46,7 @@
             </div>
             <div class="card-body">
                 <div id="ilaqaRow" class="info-row"><span class="info-label">📍 Mauze Ilaqa:</span><span class="info-value" id="ilaqaVal"></span></div>
-                <div class="info-row"><span class="info-label">📏 Distance from your current location (Open GPS):</span><span class="info-value" id="distanceVal">Detecting...</span></div>
+                <div class="info-row"><span class="info-label">📏 Distance from you:</span><span class="info-value" id="distanceVal">Detecting...</span></div>
                 
                 <div id="mapHolder" style="margin:20px 0; border-radius:12px; overflow:hidden;"></div>
                 <div id="preciseBtnRow"></div>
@@ -66,7 +66,7 @@
                     <div id="apCodeRow" class="info-row"><span class="info-label">Airport Code:</span><span class="info-value" id="apCode"></span></div>
                 </div>
 
-                <button class="btn btn-suggest" onclick="suggestEdit()">Suggest Edits / Category Changes</button>
+                <button class="btn btn-suggest" onclick="suggestEdit()">Suggest Edits / Changes</button>
             </div>
         </div>
     </div>
@@ -103,7 +103,7 @@
 
         function setupDropdown() {
             const dropdown = $("#mauzeDropdown");
-            dropdown.empty().append('<option value="">Search Mauze or Jamiat...</option>');
+            dropdown.empty().append('<option value="">Search Mauze</option>');
 
             // Sort by Jamiat
             sheetData.sort((a, b) => (a.jamiat || "").localeCompare(b.jamiat || ""));
@@ -133,18 +133,6 @@
             $("#jamiatVal").text(row.jamiat);
             
             toggleRow("#ilaqaRow", "#ilaqaVal", row.ilaqa);
-            
-            // // Map Logic
-            // if (row.link) {
-            //     $("#mapHolder").html(`<iframe width="100%" height="250" frameborder="0" src="${row.link.replace("view", "preview")}"></iframe>`).show();
-            // } else { $("#mapHolder").hide(); }
-
-            // // Precise Button
-            // if (row.coordinates) {
-            //     $("#preciseBtnRow").html(`<a href="https://www.google.com/maps/search/?api=1&query=${row.coordinates}" target="_blank" class="btn btn-primary">📍 Masjid/Markaz Vicinity</a>`);
-            //     calculateDist(row.coordinates);
-            // } else { $("#preciseBtnRow").empty(); $("#distanceVal").text("Masjid/Markaz Vicinity not updated for this Mauze."); }
-
 
             // Map Holder now uses coordinates
             if (row.coordinates) {
@@ -172,12 +160,12 @@
                     `<a href="${row.link.replace("view", "preview")}" 
                         target="_blank" 
                         class="btn btn-primary">
-                        📍 Masjid/Markaz Vicinity
+                        📍 Mauze City Map
                     </a>`
-                );
-            } else {
-                $("#preciseBtnRow").empty();
-            }
+                    ).show();
+                } else {
+                    $("#preciseBtnRow").empty().hide();
+                }
 
             // Railway & Airport sections
             const hasRW = row.railwaystationname || row.nearestrailwaystation;
