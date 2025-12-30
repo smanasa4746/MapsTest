@@ -87,6 +87,7 @@
         const csvUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQo0jofOYG07uWWttgjj9IaJJALlVJ53Fwswssg7umlct27w-A9qG0JaTWMaXmth6jm--m4gYr0vA9_/pub?gid=0&single=true&output=csv";
 
         let sheetData = [];
+        let gpsRequestId = 0;
 
         $(document).ready(function() {
             Papa.parse(csvUrl, {
@@ -202,6 +203,11 @@
 
         function calculateDist(coords) {
             const requestId = ++gpsRequestId;
+
+            if (!coords) {
+                $("#distanceVal").text("Location unavailable");
+                return;
+            }
         
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(p => {
