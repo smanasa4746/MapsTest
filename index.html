@@ -24,6 +24,7 @@
         .info-value { flex: 1; color: #444; }
         .btn { display: block; width: 100%; padding: 12px; border-radius: 10px; text-decoration: none; font-weight: 600; text-align: center; margin-top: 10px; border: none; cursor: pointer; }
         .btn-primary { background: var(--primary); color: white; }
+        .btn-inline { width: auto; display: inline-block;}
         .btn-suggest { background: #fff3cd; color: #856404; margin-top: 20px; }
         .section-title { margin: 20px 0 10px; padding-bottom: 5px; border-bottom: 2px solid var(--secondary); font-weight: 700; color: var(--primary); }
     </style>
@@ -171,7 +172,7 @@
                 $("#preciseBtnRow").html(
                     `<a href="${row.link.replace("view", "preview")}" 
                         target="_blank" 
-                        class="btn btn-primary">
+                        class="btn btn-primary btn-inline">
                         📍 Full City / Mohalla Map
                     </a>`
                 ).show();
