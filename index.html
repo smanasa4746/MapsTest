@@ -62,7 +62,7 @@
                     <div id="rwNameRow" class="info-row"><span class="info-label">Station Name:</span><span class="info-value" id="rwName"></span></div>
                     <div id="rwLineRow" class="info-row"><span class="info-label">Railway Line:</span><span class="info-value" id="rwLine"></span></div>
                     <div id="rwCodeRow" class="info-row"><span class="info-label">Station Code:</span><span class="info-value" id="rwCode"></span></div>
-                    <div id="rwNearRow" class="info-row"><span class="info-label">Nearby Station:</span><span class="info-value" id="rwNear"></span></div>
+                    <div id="rwNearRow" class="info-row"><span class="info-label">Alternate Station:</span><span class="info-value" id="rwNear"></span></div>
                 </div>
 
                 <div id="airportSection" style="display:none;">
@@ -116,7 +116,7 @@
             sheetData.sort((a, b) => (a.jamiat || "").localeCompare(b.jamiat || ""));
 
             sheetData.forEach((r, index) => {
-                const mName = r.mauzename; // Matches cleaned header "Mauze Name "
+                const mName = r.mauzename; // Matches cleaned header "Mauze Name"
                 const jName = r.jamiat;
                 if (mName) {
                     dropdown.append(new Option(`${jName} - ${mName}`, index));
@@ -172,7 +172,7 @@
                     `<a href="${row.link.replace("view", "preview")}" 
                         target="_blank" 
                         class="btn btn-primary">
-                        📍 Mauze City Map
+                        📍 Full City / Mohalla Map
                     </a>`
                 ).show();
             } else {
